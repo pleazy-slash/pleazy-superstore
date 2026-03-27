@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Dashboard</title>
+<style>
+body{
+  font-family:sans-serif;
+  background:#0f2027;
+  color:white;
+  padding:20px;
+}
+
+h1{color:#ff6600}
+
+input{
+  padding:10px;
+  margin:5px;
+  border-radius:8px;
+  border:none;
+}
+
+button{
+  background:linear-gradient(45deg,#ff6600,#ff9900);
+  color:white;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+
+.card{
+  background:#203a43;
+  padding:15px;
+  border-radius:12px;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<h1>⚙️ Admin Dashboard</h1>
+
+<h3>Add Product</h3>
+<input id="name" placeholder="Product name">
+<input id="price" placeholder="Price">
+<input id="img" placeholder="Image URL">
+<button onclick="add()">Add Product</button>
+
+<h3>📊 Analytics</h3>
+<div class="grid" id="stats"></div>
+
+<h3>📦 Orders</h3>
+<div id="orders"></div>
+
+<script>            
+const token = localStorage.getItem('token');
+if(!token){
+  alert('Please login first');
+  window.location='login.html';
+}
+async function add(){
+await fetch('/products',{
+method:'POST',
+headers:{
+'Content-Type':'application/json',
+'authorization': token
+},
+body:JSON.stringify({
+name:name.value,
+price:Number(price.value),
+img:img.value
+})
+});
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({
+name:name.value,
+price:Number(price.value),
+img:img.value
+})
+});
+alert('Added!');
+}
+async function load(){
+let s=await fetch('/analytics');
+let d=await s.json();
+
+stats.innerHTML=`
+<div class="card">Revenue<br>₦${d.revenue}</div>
+<div class="card">Orders<br>${d.orders}</div>
+<div class="card">Items<br>${d.items}</div>
+`;
+
+let o=await fetch('/orders');
+let data=await o.json();
+
+let html='';
+data.forEach(x=>{
+html+=`<div class="card">Order: ₦${x.total}</div>`;
+});
+orders.innerHTML=html;
+}
+
+load();
+</script>
+
+</body>
+</html>

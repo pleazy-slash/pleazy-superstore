@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Register</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{
+  margin:0;
+  font-family:sans-serif;
+  background:linear-gradient(135deg,#0f2027,#203a43);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  color:white;
+}
+
+.box{
+  background:rgba(0,0,0,0.4);
+  padding:30px;
+  border-radius:15px;
+  text-align:center;
+  width:300px;
+}
+
+input{
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+  border:none;
+  border-radius:8px;
+}
+
+button{
+  width:100%;
+  padding:10px;
+  background:#ff6600;
+  border:none;
+  border-radius:8px;
+  color:white;
+}
+
+a{color:lightblue}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+<h2>👤 Register</h2>
+
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+
+<button onclick="register()">Register</button>
+
+<p>Have account? <a href="login.html">Login</a></p>
+</div>
+
+<script>
+async function register(){
+await fetch('/auth/register',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({
+username:username.value,
+password:password.value
+})
+});
+
+alert('Account created!');
+window.location='login.html';
+}
+</script>
+
+</body>
+</html>

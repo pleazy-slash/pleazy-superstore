@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pleazy Superstore Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+  margin:0;
+  font-family:sans-serif;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:white;
+}
+
+/* NAVBAR */
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px;
+  backdrop-filter: blur(10px);
+  background:rgba(0,0,0,0.4);
+}
+
+.logo{
+  font-size:20px;
+  font-weight:bold;
+}
+
+/* PRODUCTS */
+#products{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:20px;
+  padding:20px;
+}
+
+.card{
+  background:rgba(255,255,255,0.1);
+  backdrop-filter:blur(10px);
+  border-radius:15px;
+  padding:10px;
+  text-align:center;
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:scale(1.05);
+}
+
+.card img{
+  width:100%;
+  height:140px;
+  object-fit:cover;
+  border-radius:10px;
+}
+
+button{
+  background:linear-gradient(45deg,#ff6600,#ff9900);
+  border:none;
+  color:white;
+  padding:8px;
+  border-radius:8px;
+  cursor:pointer;
+  margin-top:5px;
+}
+
+/* CART */
+#cart{
+  position:fixed;
+  right:-320px;
+  top:0;
+  width:300px;
+  height:100%;
+  background:white;
+  color:black;
+  transition:0.4s;
+  padding:15px;
+  box-shadow:-5px 0 20px rgba(0,0,0,0.3);
+}
+
+#cart.open{ right:0 }
+
+.cart-item{
+  border-bottom:1px solid #ddd;
+  padding:5px;
+}
+
+/* FLOAT BUTTON */
+.cart-btn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:orange;
+  padding:15px;
+  border-radius:50%;
+  font-size:20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">🔥 Pleazy Store</div>
+</header>
+
+<div id="products"></div>
+
+<div id="cart">
+<h3>🛒 Cart</h3>
+<div id="items"></div>
+<h3 id="total">₦0</h3>
+<button onclick="checkout()">Checkout</button>
+</div>
+
+<div class="cart-btn" onclick="toggleCart()">🛒</div>
+
+<script>
+let products=[],cart=[];
+
+async function load(){
+let r=await fetch('/products');
+products=await r.json();
+render();
+}
+
+function render(){
+let html='';
+products.forEach(p=>{
+html+=`
+<div class="card">
+<img src="${p.img||'https://via.placeholder.com/150'}">
+<h4>${p.name}</h4>
+<p>₦${p.price}</p>
+<button onclick='add(${JSON.stringify(p)})'>Add to Cart</button>
+</div>`;
+});
+document.getElementById('products').innerHTML=html;
+}
+
+function add(p){
+let f=cart.find(x=>x._id===p._id);
+if(f)f.qty++; else cart.push({...p,qty:1});
+draw();
+}
+
+function draw(){
+let html='',t=0;
+cart.forEach(i=>{
+t+=i.price*i.qty;
+html+=`<div class="cart-item">${i.name} x${i.qty}</div>`;
+});
+items.innerHTML=html;
+total.innerText='₦'+t;
+}
+
+function toggleCart(){
+document.getElementById('cart').classList.toggle('open');
+}
+
+async function checkout(){
+await fetch('/checkout',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify(cart)
+});
+alert('Order placed 🎉');
+cart=[];draw();
+}
+
+load();
+</script>
+
+</body>
+</html>
